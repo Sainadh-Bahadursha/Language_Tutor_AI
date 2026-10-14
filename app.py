@@ -1,19 +1,21 @@
 
 import streamlit as st
-from pages import home, grammar_practice
+
+from pages import home, grammar_practice, vocabulary_practice
 
 
 st.set_page_config(
     page_title="Language Tutor AI",
     page_icon="📘",
-    layout="centered",
-    initial_sidebar_state="expanded"
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 
 PAGES = {
     "Home": home,
     "Grammar Practice": grammar_practice,
+    "Vocabulary Practice": vocabulary_practice,
 }
 
 
@@ -22,7 +24,7 @@ def main():
 
     selection = st.sidebar.radio(
         "Go to",
-        list(PAGES.keys())
+        list(PAGES.keys()),
     )
 
     page = PAGES[selection]

@@ -19,7 +19,7 @@ class GrammarQuestion(BaseModel):
     id: int = Field(ge=1, description="Question number")
     question: str = Field(min_length=1)
     options: dict[Literal["A", "B", "C", "D"], str] = Field(
-        description="Exactly four answer options labelled A, B, C and D"
+        description="Four answer options labelled A, B, C and D"
     )
     correct_answer: Literal["A", "B", "C", "D"]
     explanation: str = Field(min_length=1)
@@ -31,6 +31,32 @@ class GrammarQuiz(BaseModel):
     topic: str = Field(min_length=1)
     level: str = Field(min_length=1)
     questions: list[GrammarQuestion] = Field(min_length=1)
+
+
+class VocabularyQuestion(BaseModel):
+    """Schema for one vocabulary multiple-choice question."""
+
+    id: int = Field(ge=1, description="Question number")
+    word: str = Field(min_length=1, description="Target vocabulary word")
+    question: str = Field(
+        min_length=1,
+        description="Question testing the meaning or usage of the word",
+    )
+    options: dict[Literal["A", "B", "C", "D"], str] = Field(
+        description="Four possible meanings or answers labelled A, B, C and D"
+    )
+    correct_answer: Literal["A", "B", "C", "D"]
+    definition: str = Field(min_length=1)
+    example_sentence: str = Field(min_length=1)
+    explanation: str = Field(min_length=1)
+
+
+class VocabularyQuiz(BaseModel):
+    """Schema for a complete vocabulary quiz."""
+
+    topic: str = Field(min_length=1)
+    level: str = Field(min_length=1)
+    questions: list[VocabularyQuestion] = Field(min_length=1)
 
 
 def _get_api_key() -> str:
@@ -56,6 +82,30 @@ def _get_api_key() -> str:
     return api_key
 
 
+def _get_structured_model(schema: type[BaseModel]):
+    """Create a Gemini model that returns output matching a Pydantic schema."""
+
+    model = ChatGoogleGenerativeAI(
+        model=MODEL_NAME,
+        google_api_key=_get_api_key(),
+        temperature=0.3,
+    )
+
+    return model.with_structured_output(schema)
+
+
+def _validate_options(questions: list[dict]) -> None:
+    """Check that every question has exactly four labelled options."""
+
+    expected_labels = {"A", "B", "C", "D"}
+
+    for question in questions:
+        if set(question["options"].keys()) != expected_labels:
+            raise ValueError(
+                f"Question {question['id']} must contain options A, B, C and D."
+            )
+
+
 def generate_grammar_questions(
     topic: str,
     level: str,
@@ -74,14 +124,7 @@ def generate_grammar_questions(
             "number_of_questions must be between 1 and 10."
         )
 
-    model = ChatGoogleGenerativeAI(
-        model=MODEL_NAME,
-        google_api_key=_get_api_key(),
-        temperature=0.3,
-    )
-
-    # Ask LangChain to enforce the Pydantic output schema.
-    structured_model = model.with_structured_output(GrammarQuiz)
+    structured_model = _get_structured_model(GrammarQuiz)
 
     prompt = PROMPT_REGISTRY["grammar_questions"]
     chain = prompt | structured_model
@@ -94,11 +137,9 @@ def generate_grammar_questions(
         }
     )
 
-    # Convert the validated Pydantic object into a normal Python dict.
     if isinstance(quiz, BaseModel):
         quiz_data = quiz.model_dump()
     elif isinstance(quiz, dict):
-        # Validate again if the integration returns a dictionary.
         quiz_data = GrammarQuiz.model_validate(quiz).model_dump()
     else:
         raise TypeError(
@@ -111,12 +152,58 @@ def generate_grammar_questions(
             f"returned {len(quiz_data['questions'])}."
         )
 
-    # Additional validation for the answer options.
-    for question in quiz_data["questions"]:
-        if set(question["options"].keys()) != {"A", "B", "C", "D"}:
-            raise ValueError(
-                f"Question {question['id']} must contain options A, B, C and D."
-            )
+    _validate_options(quiz_data["questions"])
+
+    return quiz_data
+
+
+def generate_vocabulary_questions(
+    topic: str,
+    level: str,
+    number_of_questions: int = 3,
+) -> dict:
+    """Generate a validated vocabulary quiz as a Python dictionary."""
+
+    if not topic.strip():
+        raise ValueError("Vocabulary topic cannot be empty.")
+
+    if not level.strip():
+        raise ValueError("Learner level cannot be empty.")
+
+    if not 1 <= number_of_questions <= 10:
+        raise ValueError(
+            "number_of_questions must be between 1 and 10."
+        )
+
+    structured_model = _get_structured_model(VocabularyQuiz)
+
+    prompt = PROMPT_REGISTRY["vocabulary_questions"]
+    chain = prompt | structured_model
+
+    quiz = chain.invoke(
+        {
+            "topic": topic,
+            "level": level,
+            "number_of_questions": number_of_questions,
+        }
+    )
+
+    if isinstance(quiz, BaseModel):
+        quiz_data = quiz.model_dump()
+    elif isinstance(quiz, dict):
+        quiz_data = VocabularyQuiz.model_validate(quiz).model_dump()
+    else:
+        raise TypeError(
+            f"Unexpected structured output type: {type(quiz).__name__}"
+        )
+
+    if len(quiz_data["questions"]) != number_of_questions:
+        raise ValueError(
+            f"Requested {number_of_questions} questions, but Gemini "
+            f"returned {len(quiz_data['questions'])}."
+        )
+
+    _validate_options(quiz_data["questions"])
 
     return quiz_data
 
@@ -126,18 +213,17 @@ if __name__ == "__main__":
     print(f"Model: {MODEL_NAME}")
 
     try:
-        result = generate_grammar_questions(
-            topic="Present Simple Tense",
+        result = generate_vocabulary_questions(
+            topic="Education",
             level="Beginner",
             number_of_questions=3,
         )
 
-        print("\nSmoke test successful.")
-        print("\nGenerated JSON:\n")
+        print("\nVocabulary smoke test successful.")
         print(json.dumps(result, indent=2, ensure_ascii=False))
 
     except Exception as error:
-        print("\nSmoke test failed.")
+        print("\nVocabulary smoke test failed.")
         print(f"Error type: {type(error).__name__}")
         print(f"Error details: {error}")
         raise SystemExit(1)
