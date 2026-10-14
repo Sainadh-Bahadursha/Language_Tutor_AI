@@ -1,4 +1,3 @@
-
 import streamlit as st
 
 
@@ -11,36 +10,45 @@ def app():
 
     st.markdown(
         """
-        Improve your English through interactive exercises,
-        AI-generated questions, and personalized feedback.
+        Improve your English through interactive exercises, AI-generated
+        questions, reading activities, and personalized translation feedback.
+        Choose an activity from the sidebar to get started.
         """
     )
 
     st.divider()
-
     st.subheader("Your Learning Activities")
 
-    # Grammar Practice
-    st.markdown("### 📘 Grammar Practice")
+    with st.container(border=True):
+        st.markdown("### 📘 Grammar Practice")
+        st.write(
+            "Strengthen your grammar through multiple-choice questions on "
+            "tenses, articles, prepositions, subject-verb agreement, and more."
+        )
 
-    st.write(
-        "Strengthen your understanding of English grammar through "
-        "multiple-choice questions on tenses, articles, prepositions, "
-        "subject-verb agreement, and other grammar topics."
-    )
+    with st.container(border=True):
+        st.markdown("### 📚 Vocabulary Practice")
+        st.write(
+            "Learn useful words by topic, test your understanding, and review "
+            "definitions, example sentences, and explanations."
+        )
 
-    # Vocabulary Practice
-    st.markdown("### 📚 Vocabulary Practice")
+    with st.container(border=True):
+        st.markdown("### 📖 Reading Comprehension")
+        st.write(
+            "Read a level-appropriate passage, answer comprehension questions, "
+            "and review explanations after submitting your answers."
+        )
 
-    st.write(
-        "Build your English vocabulary by exploring words across "
-        "different topics, learning their meanings, and reviewing "
-        "example sentences with AI-powered feedback."
-    )
+    with st.container(border=True):
+        st.markdown("### 🌐 Translation Practice")
+        st.write(
+            "Translate text between supported languages and receive feedback "
+            "on meaning, grammar, and natural phrasing."
+        )
 
     st.divider()
-
     st.info(
-        "Select Grammar Practice or Vocabulary Practice from "
-        "the sidebar to begin learning."
+        "Select Grammar Practice, Vocabulary Practice, Reading Comprehension, "
+        "Reading Exam, or Translation Practice from the sidebar to begin."
     )

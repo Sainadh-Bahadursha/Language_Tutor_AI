@@ -1,7 +1,13 @@
 
 import streamlit as st
 
-from pages import home, grammar_practice, vocabulary_practice
+from pages import (
+    home,
+    grammar_practice,
+    vocabulary_practice,
+    reading_comprehension,
+    translation_practice,
+)
 
 
 st.set_page_config(
@@ -16,6 +22,8 @@ PAGES = {
     "Home": home,
     "Grammar Practice": grammar_practice,
     "Vocabulary Practice": vocabulary_practice,
+    "Reading Comprehension": reading_comprehension,
+    "Translation Practice": translation_practice,
 }
 
 
