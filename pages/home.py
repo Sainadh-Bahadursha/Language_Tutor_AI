@@ -1,18 +1,19 @@
+
 import streamlit as st
 
 
 def app():
-    st.title("Language Tutor AI")
+    st.title("📘 Language Tutor AI")
 
     st.write(
-        "Welcome to your personal AI-powered English learning assistant!"
+        "Welcome to your personal AI-powered language-learning assistant!"
     )
 
     st.markdown(
         """
-        Improve your English through interactive exercises, AI-generated
-        questions, reading activities, and personalized translation feedback.
-        Choose an activity from the sidebar to get started.
+        Improve your language skills through interactive exercises,
+        AI-generated questions, reading activities, translation feedback,
+        speaking practice, and image-based comprehension.
         """
     )
 
@@ -43,12 +44,29 @@ def app():
     with st.container(border=True):
         st.markdown("### 🌐 Translation Practice")
         st.write(
-            "Translate text between supported languages and receive feedback "
-            "on meaning, grammar, and natural phrasing."
+            "Translate sentences between supported languages and receive "
+            "feedback on meaning, grammar, and natural phrasing."
+        )
+
+    with st.container(border=True):
+        st.markdown("### 🎙️ Speaking Practice")
+        st.write(
+            "Read an AI-generated paragraph aloud in Telugu, Hindi, or English. "
+            "Record your reading and receive transcription and improvement feedback."
+        )
+
+    with st.container(border=True):
+        st.markdown("### 🖼️ Image Comprehension")
+        st.write(
+            "Describe an image aloud in Telugu, Hindi, or English. "
+            "Receive feedback on your description, relevant details, "
+            "grammar, and vocabulary."
         )
 
     st.divider()
+
     st.info(
-        "Select Grammar Practice, Vocabulary Practice, Reading Comprehension, "
-        "Reading Exam, or Translation Practice from the sidebar to begin."
+        "Choose a learning activity from the sidebar to begin. "
+        "Speaking Practice and Image Comprehension use browser-based "
+        "audio recording."
     )

@@ -7,6 +7,8 @@ from pages import (
     vocabulary_practice,
     reading_comprehension,
     translation_practice,
+    speaking_practice,
+    image_comprehension,
 )
 
 
@@ -24,15 +26,18 @@ PAGES = {
     "Vocabulary Practice": vocabulary_practice,
     "Reading Comprehension": reading_comprehension,
     "Translation Practice": translation_practice,
+    "Speaking Practice": speaking_practice,
+    "Image Comprehension": image_comprehension,
 }
 
 
 def main():
-    st.sidebar.title("Language Tutor AI")
+    st.sidebar.title("📘 Language Tutor AI")
+    st.sidebar.caption("Your personal AI language-learning assistant")
 
     selection = st.sidebar.radio(
-        "Go to",
-        list(PAGES.keys()),
+        "Choose a learning activity",
+        options=list(PAGES.keys()),
     )
 
     page = PAGES[selection]
