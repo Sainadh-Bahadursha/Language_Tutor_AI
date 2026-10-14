@@ -6,7 +6,7 @@ from datetime import date
 # 1. PAGE CONFIGURATION
 # =====================================================
 st.set_page_config(
-    page_title="Streamlit Fundamentals Lab",
+    page_title="Streamlit Fundamentals Lab v1",
     page_icon="📚",
     layout="wide",
     initial_sidebar_state="expanded",
